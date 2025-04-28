@@ -6,29 +6,35 @@ O sistema permitirá o cadastro de equipamentos, abertura de chamados de manuten
 
 O projeto é dividido em:
 
-Front-end: Desenvolvimento do site em HTML, CSS e JavaScript (hospedado na Vercel).
+- Front-end: Desenvolvimento do site em HTML, CSS e JavaScript (hospedado na Vercel).
 
-Back-end: API criada com Flask (Python), responsável pela comunicação com o banco de dados.
+- Back-end: API criada com Flask (Python), responsável pela comunicação com o banco de dados.
 
-Banco de dados: Supabase (PostgreSQL) para armazenamento seguro das informações.
+- Banco de dados: Supabase (PostgreSQL) para armazenamento seguro das informações.
 
-🚀 Tecnologias Utilizadas
+
+🚀 Tecnologias Utilizadas:
+
   Front-end
+  
     - HTML5
     - CSS3
     - JavaScript
   
   Back-end
+  
     - Python 3
     - Flask
     - Bibliotecas de integração com Supabase
 
   Banco de Dados
+  
     - Supabase (PostgreSQL)
 
   Hospedagem
+  
     - Front-end: Vercel
-    - Back-end: Render (ou Railway)
+    - Back-end: Render
 
 🛠 Funcionalidades
   - Cadastro de equipamentos de TI.
