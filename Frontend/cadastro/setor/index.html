@@ -1,0 +1,28 @@
+<h1>Cadastro de Setor</h1>
+<form class="form-cadastro" onsubmit="cadastrarSetor(event)">
+    <input type="text" id="nomeSetor" placeholder="Nome do Setor" required>
+    <input type="text" id="descricaoSetor" placeholder="Descrição" required>
+    <button type="submit">Cadastrar</button>
+</form>
+
+<script>
+function cadastrarSetor(event) {
+    event.preventDefault();
+
+    const dados = {
+        nome: document.getElementById("nomeSetor").value,
+        descricao: document.getElementById("descricaoSetor").value
+    };
+
+    fetch("https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/setores", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(res => alert("Setor cadastrado com sucesso!"))
+    .catch(err => alert("Erro ao cadastrar setor."));
+}
+</script>
