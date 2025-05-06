@@ -1,0 +1,43 @@
+<h1>Cadastro de Equipamento</h1>
+<form class="form-cadastro" onsubmit="cadastrarEquipamento(event)">
+    <input type="text" id="nome" placeholder="Nome do Equipamento" required>
+    <input type="text" id="numero_serie" placeholder="Número de Série" required>
+    <input type="text" id="tipo" placeholder="Tipo (opcional)">
+    <input type="date" id="data_aquisicao">
+
+    <select id="status">
+        <option value="ativo">Ativo</option>
+        <option value="inativo">Inativo</option>
+        <option value="manutenção">Manutenção</option>
+    </select>
+
+    <input type="text" id="funcionario_id" placeholder="ID do Funcionário (opcional)">
+    <input type="text" id="departamento_id" placeholder="ID do Departamento (opcional)">
+
+    <button type="submit">Cadastrar</button>
+</form>
+
+<script>
+function cadastrarEquipamento(event) {
+    event.preventDefault();
+
+    const dados = {
+        nome: document.getElementById("nome").value,
+        numero_serie: document.getElementById("numero_serie").value,
+        tipo: document.getElementById("tipo").value || null,
+        data_aquisicao: document.getElementById("data_aquisicao").value || null,
+        status: document.getElementById("status").value,
+        funcionario_id: document.getElementById("funcionario_id").value || null,
+        departamento_id: document.getElementById("departamento_id").value || null
+    };
+
+    fetch("https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(res => alert("Equipamento cadastrado com sucesso!"))
+    .catch(err => alert("Erro ao cadastrar equipamento."));
+}
+</script>
