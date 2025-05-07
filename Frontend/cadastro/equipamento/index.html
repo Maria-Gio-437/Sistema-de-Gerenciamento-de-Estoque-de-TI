@@ -1,43 +1,55 @@
-<h1>Cadastro de Equipamento</h1>
-<form class="form-cadastro" onsubmit="cadastrarEquipamento(event)">
-    <input type="text" id="nome" placeholder="Nome do Equipamento" required>
-    <input type="text" id="numero_serie" placeholder="Número de Série" required>
-    <input type="text" id="tipo" placeholder="Tipo (opcional)">
-    <input type="date" id="data_aquisicao">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Equipamento</title>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+  <div id="sidebar-container"></div>
 
-    <select id="status">
+  <div class="main-content">
+    <h1>Cadastro de Equipamento</h1>
+    <form class="form-cadastro" onsubmit="cadastrarEquipamento(event)">
+      <input type="text" id="nome" placeholder="Nome do Equipamento" required>
+      <input type="text" id="numero_serie" placeholder="Número de Série" required>
+      <input type="text" id="tipo" placeholder="Tipo (opcional)">
+      <input type="date" id="data_aquisicao">
+      <select id="status" required>
+        <option value="">Selecione o status</option>
         <option value="ativo">Ativo</option>
         <option value="inativo">Inativo</option>
         <option value="manutenção">Manutenção</option>
-    </select>
+      </select>
+      <button type="submit">Cadastrar</button>
+    </form>
+  </div>
 
-    <input type="text" id="funcionario_id" placeholder="ID do Funcionário (opcional)">
-    <input type="text" id="departamento_id" placeholder="ID do Departamento (opcional)">
+  <script>
+    fetch('../../sidebar/index.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("sidebar-container").innerHTML = html;
+      });
 
-    <button type="submit">Cadastrar</button>
-</form>
-
-<script>
-function cadastrarEquipamento(event) {
-    event.preventDefault();
-
-    const dados = {
+    function cadastrarEquipamento(event) {
+      event.preventDefault();
+      const dados = {
         nome: document.getElementById("nome").value,
         numero_serie: document.getElementById("numero_serie").value,
         tipo: document.getElementById("tipo").value || null,
         data_aquisicao: document.getElementById("data_aquisicao").value || null,
-        status: document.getElementById("status").value,
-        funcionario_id: document.getElementById("funcionario_id").value || null,
-        departamento_id: document.getElementById("departamento_id").value || null
-    };
-
-    fetch("https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos", {
+        status: document.getElementById("status").value
+      };
+      fetch("https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados)
-    })
-    .then(res => res.json())
-    .then(res => alert("Equipamento cadastrado com sucesso!"))
-    .catch(err => alert("Erro ao cadastrar equipamento."));
-}
-</script>
+      })
+      .then(res => res.json())
+      .then(() => alert("Equipamento cadastrado com sucesso!"))
+      .catch(() => alert("Erro ao cadastrar equipamento."));
+    }
+  </script>
+</body>
+</html>
