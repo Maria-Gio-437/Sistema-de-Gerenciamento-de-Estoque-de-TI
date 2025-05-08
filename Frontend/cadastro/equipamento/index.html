@@ -9,8 +9,8 @@
   <div id="sidebar-container"></div>
 
   <div class="main-content">
-    <h1>Cadastro de Equipamento</h1>
     <form class="form-cadastro" onsubmit="cadastrarEquipamento(event)">
+      <h1>Cadastro de Equipamento</h1>
       <input type="text" id="nome" placeholder="Nome do Equipamento" required>
       <input type="text" id="numero_serie" placeholder="Número de Série" required>
       <input type="text" id="tipo" placeholder="Tipo (opcional)">
@@ -26,14 +26,20 @@
   </div>
 
   <script>
-    fetch('../../sidebar/index.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("sidebar-container").innerHTML = html;
-      });
+    fetch('/sidebar/index.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById("sidebar-container").innerHTML = html;
+
+    const script = document.createElement("script");
+    script.src = "/sidebar/sidebar.js";
+    document.body.appendChild(script);
+  });
+
 
     function cadastrarEquipamento(event) {
       event.preventDefault();
+
       const dados = {
         nome: document.getElementById("nome").value,
         numero_serie: document.getElementById("numero_serie").value,
@@ -41,6 +47,7 @@
         data_aquisicao: document.getElementById("data_aquisicao").value || null,
         status: document.getElementById("status").value
       };
+
       fetch("https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

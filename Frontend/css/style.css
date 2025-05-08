@@ -56,8 +56,8 @@ body {
 }
 
 .main-content {
-  margin-left: 240px;
-  padding: 40px 20px;
+  margin-left: 200px;
+  padding: 120px 20px;
   flex: 1;
   box-sizing: border-box;
 }
