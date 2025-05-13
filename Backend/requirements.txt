@@ -3,3 +3,5 @@ Flask-Cors
 flask-supabase
 python-dotenv
 gunicorn
+pytest
+requests
