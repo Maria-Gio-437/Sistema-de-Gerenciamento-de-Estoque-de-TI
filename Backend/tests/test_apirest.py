@@ -24,7 +24,10 @@ def test_criar_equipamento_sucesso(client):
     mock_response = MagicMock()
     mock_response.data = [{**novo_equipamento, 'id': 'uuid-eq-001'}]
 
-    with patch('apirest.supabase.client') as mock_client:
+    with patch('apirest.supabase') as mock_supabase:
+        mock_client = MagicMock()
+        mock_supabase.client = mock_client
+
         mock_client.from_.return_value.insert.return_value.execute.return_value = mock_response
 
         response = client.post('/equipamentos', data=json.dumps(novo_equipamento), content_type='application/json')
