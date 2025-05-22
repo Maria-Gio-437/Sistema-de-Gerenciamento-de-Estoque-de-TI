@@ -182,6 +182,17 @@ def excluir_equipamento(id):
     except Exception as e:
         return jsonify({'error': 'Erro ao excluir equipamento', 'details': str(e)}), 500
 
+# ======================== FUNCIONARIO ========================
+# Listar funcionarios
+@app.route('/funcionarios', methods=['GET'])
+def listar_funcionarios():
+    resp = supabase.client.from_('funcionarios').select('*').execute()
+    if resp.data is not None:
+        return jsonify(resp.data), 200
+    else:
+        return jsonify({'error': 'Erro ao buscar funcionarios', 'details': resp}), 500
+
+
 # Health check da conexão com o Supabase
 @app.route('/health', methods=['GET'])
 def health_check():
