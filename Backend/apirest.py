@@ -26,21 +26,21 @@ def signup_user():
         return jsonify({'error': 'Email e senha são obrigatórios'}), 400
 
     try:
-        response = supabase.client.auth.sign_up(email=email, password=password)
+        response = supabase.client.auth.sign_up({"email": email, "password": password})
 
-        if response.user:
+        if hasattr(response, 'user') and response.user:
             return jsonify({
                 'message': 'Usuário cadastrado com sucesso. Verifique seu email para confirmar.',
-                'user': response.user.dict(), # Retorna os dados do usuário
-                'session': response.session.dict() if response.session else None # Retorna a sessão
+                'user': response.user.dict(),
+                'session': response.session.dict() if response.session else None
             }), 201
-        elif response.error: # Erro do Supabase (email já existe, senha fraca)
+        elif hasattr(response, 'error') and response.error: # Erro do Supabase
             return jsonify({'error': response.error.message}), 400
-        else: # Outros erros
-            return jsonify({'error': 'Erro desconhecido ao cadastrar usuário'}), 500
+        else: # Erros não especificados
+            return jsonify({'error': 'Erro desconhecido ou resposta inesperada da autenticação'}), 500
 
     except Exception as e:
-        return jsonify({'error': 'Erro interno do servidor ao cadastrar usuário', 'details': str(e)}), 500
+        return jsonify({'error': 'Erro interno do servidor ao cadastrar usuário', 'details': f"Trace: {str(e)} Type: {type(e).__name__}"}), 500
 
 @app.route('/auth/signin', methods=['POST'])
 def signin_user():
@@ -60,7 +60,7 @@ def signin_user():
                 'user': response.user.dict(),
                 'session': response.session.dict()
             }), 200
-        elif response.error: #
+        elif response.error: 
             return jsonify({'error': response.error.message}), 401
         else:
             return jsonify({'error': 'Erro desconhecido ao fazer login'}), 500
