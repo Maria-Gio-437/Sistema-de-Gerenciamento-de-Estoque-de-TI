@@ -14,6 +14,60 @@ app.config['SUPABASE_KEY'] = os.getenv('SUPABASE_KEY')
 
 supabase = Supabase(app)
 
+# ========================= AUTENTICACAO =========================
+
+@app.route('/auth/signup', methods=['POST'])
+def signup_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email e senha são obrigatórios'}), 400
+
+    try:
+        response = supabase.client.auth.sign_up(email=email, password=password)
+
+        if response.user:
+            return jsonify({
+                'message': 'Usuário cadastrado com sucesso. Verifique seu email para confirmar.',
+                'user': response.user.dict(), # Retorna os dados do usuário
+                'session': response.session.dict() if response.session else None # Retorna a sessão
+            }), 201
+        elif response.error: # Erro do Supabase (email já existe, senha fraca)
+            return jsonify({'error': response.error.message}), 400
+        else: # Outros erros
+            return jsonify({'error': 'Erro desconhecido ao cadastrar usuário'}), 500
+
+    except Exception as e:
+        return jsonify({'error': 'Erro interno do servidor ao cadastrar usuário', 'details': str(e)}), 500
+
+@app.route('/auth/signin', methods=['POST'])
+def signin_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email e senha são obrigatórios'}), 400
+
+    try:
+        response = supabase.client.auth.sign_in_with_password(email=email, password=password)
+
+        if response.user: 
+            return jsonify({
+                'message': 'Login realizado com sucesso.',
+                'user': response.user.dict(),
+                'session': response.session.dict()
+            }), 200
+        elif response.error: #
+            return jsonify({'error': response.error.message}), 401
+        else:
+            return jsonify({'error': 'Erro desconhecido ao fazer login'}), 500
+
+    except Exception as e:
+        return jsonify({'error': 'Erro interno do servidor ao fazer login', 'details': str(e)}), 500
+
 # ========================= EMPRESA =========================
 
 # Listar empresas
@@ -29,11 +83,14 @@ def listar_empresas():
 @app.route('/empresas', methods=['POST'])
 def criar_empresa():
     data = request.json
-    resp = supabase.client.from_('empresa').insert([data]).execute()
-    if resp.data is not None and len(resp.data) > 0:
-        return jsonify(resp.data), 201
-    else:
-        return jsonify({'error': 'Erro ao criar empresa', 'details': resp}), 500
+    try:
+        resp = supabase.client.from_('empresa').insert([data]).execute()
+        if resp.data is not None and len(resp.data) > 0:
+            return jsonify(resp.data), 201
+        else:
+            return jsonify({'message': 'Empresa criada com sucesso, mas sem dados de retorno'}), 201
+    except Exception as e:
+        return jsonify({'error': 'Erro ao criar empresa', 'details': str(e)}), 500
 
 # Editar empresa
 @app.route('/empresas/<id>', methods=['PUT'])
@@ -71,11 +128,26 @@ def listar_gestores():
 @app.route('/gestores', methods=['POST'])
 def criar_gestor():
     data = request.json
-    resp = supabase.client.from_('gestor').insert([data]).execute()
-    if resp.data is not None and len(resp.data) > 0:
-        return jsonify(resp.data), 201
-    else:
-        return jsonify({'error': 'Erro ao criar gestor', 'details': resp}), 500
+    try:
+        dados_para_insercao = {
+            'nome': data.get('nome'),
+            'email': data.get('email'),
+            'senha': data.get('senha'),
+            'cpf': data.get('cpf'),
+            'telefone': data.get('telefone'),
+            'empresa_id': data.get('empresa_id') 
+        }
+
+        dados_finais = {k: v for k, v in dados_para_insercao.items() if v is not None}
+
+        resp = supabase.client.from_('gestor').insert([dados_finais]).execute()
+
+        if resp.data is not None and len(resp.data) > 0:
+            return jsonify(resp.data), 201
+        else:
+            return jsonify({'message': 'Gestor criado com sucesso'}), 201
+    except Exception as e:
+        return jsonify({'error': 'Erro ao criar gestor', 'details': str(e)}), 500
 
 # Editar gestor
 @app.route('/gestores/<id>', methods=['PUT'])
@@ -181,6 +253,17 @@ def excluir_equipamento(id):
         return jsonify({'message': 'Equipamento excluído com sucesso'}), 200
     except Exception as e:
         return jsonify({'error': 'Erro ao excluir equipamento', 'details': str(e)}), 500
+
+# ======================== FUNCIONARIO ========================
+# Listar funcionarios
+@app.route('/funcionarios', methods=['GET'])
+def listar_funcionarios():
+    resp = supabase.client.from_('funcionarios').select('*').execute()
+    if resp.data is not None:
+        return jsonify(resp.data), 200
+    else:
+        return jsonify({'error': 'Erro ao buscar funcionarios', 'details': resp}), 500
+
 
 # Health check da conexão com o Supabase
 @app.route('/health', methods=['GET'])
