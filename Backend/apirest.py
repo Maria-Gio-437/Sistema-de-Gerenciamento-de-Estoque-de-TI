@@ -36,7 +36,7 @@ def signup_user():
             }), 201
         elif hasattr(response, 'error') and response.error: # Erro do Supabase
             return jsonify({'error': response.error.message}), 400
-        else: # Erros não especificados
+        else:
             return jsonify({'error': 'Erro desconhecido ou resposta inesperada da autenticação'}), 500
 
     except Exception as e:
@@ -52,21 +52,21 @@ def signin_user():
         return jsonify({'error': 'Email e senha são obrigatórios'}), 400
 
     try:
-        response = supabase.client.auth.sign_in_with_password(email=email, password=password)
+        response = supabase.client.auth.sign_in_with_password({"email": email, "password": password})
 
-        if response.user: 
+        if hasattr(response, 'user') and response.user:
             return jsonify({
                 'message': 'Login realizado com sucesso.',
                 'user': response.user.dict(),
                 'session': response.session.dict()
             }), 200
-        elif response.error: 
+        elif hasattr(response, 'error') and response.error: # Erro do Supabase (credenciais inválidas)
             return jsonify({'error': response.error.message}), 401
         else:
-            return jsonify({'error': 'Erro desconhecido ao fazer login'}), 500
+            return jsonify({'error': 'Erro desconhecido ou resposta inesperada da autenticação'}), 500
 
     except Exception as e:
-        return jsonify({'error': 'Erro interno do servidor ao fazer login', 'details': str(e)}), 500
+        return jsonify({'error': 'Erro interno do servidor ao fazer login', 'details': f"Trace: {str(e)} Type: {type(e).__name__}"}), 500
 
 # ========================= EMPRESA =========================
 
