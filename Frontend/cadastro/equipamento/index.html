@@ -23,6 +23,8 @@
       </select>
       <button type="submit">Cadastrar</button>
     </form>
+
+    <div id="resposta"></div>
   </div>
 
   <script>
@@ -41,16 +43,18 @@
       event.preventDefault();
 
       const dados = {
-        nome: document.getElementById("nome").value,
-        numero_serie: document.getElementById("numero_serie").value,
-        tipo: document.getElementById("tipo").value || null,
-        data_aquisicao: document.getElementById("data_aquisicao").value || null,
-        status: document.getElementById("status").value
+        nome: document.getElementById('nome').value,
+        numero_serie: document.getElementById('numero_serie').value,
+        tipo: document.getElementById('tipo').value,
+        data_aquisicao: document.getElementById('data_aquisicao').value,
+        status: document.getElementById('status').value
       };
 
-      fetch("https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(dados)
       })
       .then(res => res.json())

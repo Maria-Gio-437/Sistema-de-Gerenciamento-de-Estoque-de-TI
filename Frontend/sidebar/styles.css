@@ -46,3 +46,22 @@
   display: block;
   margin: 0 auto 10px auto;
 }
+.submenu {
+  list-style: none;
+  padding-left: 15px;
+  display: none;
+}
+
+.menu-toggle.open .submenu {
+  display: block;
+}
+
+.menu-toggle > a::after {
+  content: ' ▼';
+  float: right;
+  transition: transform 0.3s ease;
+}
+
+.menu-toggle.open > a::after {
+  transform: rotate(-180deg);
+}

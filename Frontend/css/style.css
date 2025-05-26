@@ -1,7 +1,13 @@
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: Arial, sans-serif;
-  background-color: #f2f2f2;
+  background-color: #2e2e2e;
+  color: white;
   display: flex;
   min-height: 100vh;
   overflow-x: hidden;
@@ -10,13 +16,14 @@ body {
 .sidebar {
   width: 220px;
   height: 100vh;
-  background-color: #ffa500;
+  background-color: #111;
   position: fixed;
   top: 0;
   left: 0;
   padding: 20px;
   box-sizing: border-box;
   z-index: 1000;
+  border-right: 1px solid orange;
 }
 
 .logo {
@@ -29,6 +36,7 @@ body {
   height: auto;
   display: block;
   margin: 0 auto;
+  filter: drop-shadow(0 0 10px orange);
 }
 
 .sidebar nav ul {
@@ -46,17 +54,18 @@ body {
   font-weight: bold;
   display: block;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 6px;
   transition: background-color 0.2s ease;
 }
 
 .sidebar nav ul li a:hover,
 .sidebar nav ul li a.active {
-  background-color: #e69500;
+  background-color: orange;
+  color: #111;
 }
 
 .main-content {
-  margin-left: 200px;
+  margin-left: 220px;
   padding: 120px 20px;
   flex: 1;
   box-sizing: border-box;
@@ -68,10 +77,10 @@ body {
 }
 
 .form-cadastro {
-  background-color: #fff;
+  background-color: #111;
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 165, 0, 0.2);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -82,22 +91,26 @@ body {
   width: 100%;
   padding: 12px;
   box-sizing: border-box;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  border-radius: 6px;
+  border: 1px solid orange;
+  background-color: #2e2e2e;
+  color: white;
   font-size: 15px;
 }
 
 .form-cadastro button {
-  background-color: #ffa500;
-  color: white;
+  background-color: orange;
+  color: #111;
   padding: 12px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   width: 100%;
   font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
 .form-cadastro button:hover {
-  background-color: #e69500;
+  background-color: #ff9900;
 }
