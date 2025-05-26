@@ -1,16 +1,24 @@
-<!-- sidebar/index.html -->
 <div class="sidebar">
   <div class="logo">
     <img src="/Logo.png" class="logo-img">
   </div>
+
   <nav>
     <ul>
-      <li><a href="../index.html">Início</a></li>
-      <li><a href="../cadastro/equipamento/index.html">Equipamentos</a></li>
-      <li><a href="#">Funcionários</a></li>
-      <li><a href="#">Departamentos</a></li>
-      <li><a href="#">Estoque</a></li>
-      <li><a href="#">Chamados</a></li>
+      <li class="menu-toggle">
+        <a href="#" onclick="toggleSubmenu(event)">Cadastros ▾</a>
+        <ul class="submenu" id="cadastro-submenu">
+          <li><a href="/cadastro/equipamento/index.html">Equipamentos</a></li>
+          <li><a href="/cadastro/funcionario/index.html">Funcionários</a></li>
+          <li><a href="/cadastro/departamento/index.html">Departamentos</a></li>
+        </ul>
+      </li>
+
+      <li><a href="#" onclick="carregarTela(event, 'equipamento')">Equipamentos</a></li>
+      <li><a href="#" onclick="carregarTela(event, 'funcionario')">Funcionários</a></li>
+      <li><a href="#" onclick="carregarTela(event, 'departamento')">Departamentos</a></li>
+      <li><a href="#" onclick="carregarTela(event, 'chamados')">Chamados</a></li>
+      <li><a href="#" onclick="carregarTela(event, 'estoque')">Estoque</a></li>
     </ul>
   </nav>
 </div>
