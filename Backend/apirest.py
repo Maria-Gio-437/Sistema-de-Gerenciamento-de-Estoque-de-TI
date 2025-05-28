@@ -255,15 +255,45 @@ def excluir_equipamento(id):
         return jsonify({'error': 'Erro ao excluir equipamento', 'details': str(e)}), 500
 
 # ======================== FUNCIONARIO ========================
-# Listar funcionarios
+# Listar funcionario
 @app.route('/funcionarios', methods=['GET'])
 def listar_funcionarios():
-    resp = supabase.client.from_('funcionarios').select('*').execute()
+    resp = supabase.client.from_('funcionario').select('*').execute()
     if resp.data is not None:
         return jsonify(resp.data), 200
     else:
-        return jsonify({'error': 'Erro ao buscar funcionarios', 'details': resp}), 500
+        return jsonify({'error': 'Erro ao buscar funcionario', 'details': resp}), 500
 
+# Criar funcionario
+@app.route('/funcionarios', methods=['POST'])
+def criar_funcionario():
+    data = request.json
+    resp = supabase.client.from_('funcionario').insert([data]).execute()
+    if resp.data is not None and len(resp.data) > 0:
+        return jsonify(resp.data), 201
+    else:
+        return jsonify({'error': 'Erro ao criar funcionario', 'details': resp}), 500
+    
+# Editar funcionario
+@app.route('/funcionarios/<id>', methods=['PUT'])
+def editar_funcionario(id):
+    data = request.json
+    resp = supabase.client.from_('funcionario').update(data).eq('id', id).execute()
+    if resp.data is not None and len(resp.data) > 0:
+        return jsonify(resp.data), 200
+    elif resp.count > 0:
+        return jsonify({'message': 'Funcionario atualizado com sucesso'}), 200
+    else:
+        return jsonify({'error': 'Erro ao editar funcionario', 'details': resp}), 500
+
+# Excluir funcionario
+@app.route('/funcionarios/<id>', methods=['DELETE'])
+def excluir_funcionario(id):
+    try:
+        resp = supabase.client.from_('funcionario').delete().eq('id', id).execute()
+        return jsonify({'message': 'Funcionario excluído com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Erro ao excluir funcionario', 'details': str(e)}), 500
 
 # Health check da conexão com o Supabase
 @app.route('/health', methods=['GET'])
