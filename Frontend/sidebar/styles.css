@@ -46,22 +46,38 @@
   display: block;
   margin: 0 auto 10px auto;
 }
+
+/* Oculta o submenu por padrão */
 .submenu {
   list-style: none;
   padding-left: 15px;
-  display: none;
+  display: none; /* ESCONDE o submenu inicialmente */
+  overflow: hidden; /* Garante que o conteúdo não vaze */
+  transition: max-height 0.3s ease-out; /* Transição para abertura/fechamento suave */
+  max-height: 0; /* Começa com altura zero */
 }
 
-.menu-toggle.open .submenu {
-  display: block;
+/* Mostra o submenu quando ele tem a classe 'active' */
+.submenu.active {
+  display: block; /* Torna o submenu visível */
+  max-height: 200px; /* Defina uma altura máxima suficiente para todos os itens */
 }
 
+/* Estilo para os itens dentro do submenu */
+.submenu li a {
+  padding: 8px 0 8px 10px; /* Ajuste o padding para os itens do submenu */
+  font-weight: normal; /* Menos negrito que os itens principais */
+  font-size: 0.95em; /* Ligeiramente menor */
+}
+
+/* Estilo para a seta do menu-toggle */
 .menu-toggle > a::after {
   content: ' ▼';
   float: right;
   transition: transform 0.3s ease;
 }
 
+/* Gira a seta quando o menu está aberto */
 .menu-toggle.open > a::after {
   transform: rotate(-180deg);
 }
