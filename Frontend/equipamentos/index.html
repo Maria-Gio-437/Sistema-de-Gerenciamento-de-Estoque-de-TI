@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>GETI - Lista de Equipamentos</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/tabela/style.css"> 
 </head>
 <body>
   <div id="sidebar-container"></div>
@@ -11,24 +11,26 @@
   <div class="main-content">
     <h1>Lista de Equipamentos</h1>
 
-    <table class="tabela-listagem" id="tabela-equipamentos">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Nº de Série</th>
-          <th>Tipo</th>
-          <th>Status</th>
-          <th>Data de Aquisição</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Linhas adicionadas dinamicamente -->
-      </tbody>
-    </table>
+    <div class="tabela-container">
+      <table class="tabela-listagem" id="tabela-equipamentos">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Nº de Série</th>
+            <th>Tipo</th>
+            <th>Status</th>
+            <th>Data de Aquisição</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Linhas adicionadas dinamicamente -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    // Carrega o sidebar dinamicamente
     fetch('/sidebar/index.html')
       .then(res => res.text())
       .then(html => {
@@ -38,7 +40,6 @@
         document.body.appendChild(script);
       });
 
-    // Busca e exibe os equipamentos
     fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos')
       .then(res => res.json())
       .then(data => {
@@ -54,17 +55,60 @@
               <td>${eq.tipo || '---'}</td>
               <td>${eq.status}</td>
               <td>${eq.data_aquisicao || '---'}</td>
+              <td class="acoes">
+                <div class="menu-container">
+                  <button class="menu-btn" onclick="abrirMenu(this)">⋮</button>
+                  <div class="mini-menu">
+                    <button onclick="editarEquipamento('${eq.id}')">Editar</button>
+                    <button onclick="excluirEquipamento('${eq.id}')">Excluir</button>
+                  </div>
+                </div>
+              </td>
             `;
             corpoTabela.appendChild(linha);
           });
         } else {
-          corpoTabela.innerHTML = `<tr><td colspan="5">Erro ao carregar dados.</td></tr>`;
+          corpoTabela.innerHTML = `<tr><td colspan="6">Erro ao carregar dados.</td></tr>`;
         }
       })
       .catch(() => {
         const corpoTabela = document.querySelector("#tabela-equipamentos tbody");
-        corpoTabela.innerHTML = `<tr><td colspan="5">Erro ao buscar equipamentos.</td></tr>`;
+        corpoTabela.innerHTML = `<tr><td colspan="6">Erro ao buscar equipamentos.</td></tr>`;
       });
+
+    function abrirMenu(botao) {
+      const menus = document.querySelectorAll(".mini-menu");
+      menus.forEach(menu => menu.style.display = "none");
+      const menu = botao.nextElementSibling;
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+
+      document.addEventListener("click", function fechar(e) {
+        if (!botao.parentElement.contains(e.target)) {
+          menu.style.display = "none";
+          document.removeEventListener("click", fechar);
+        }
+      });
+    }
+
+    function editarEquipamento(id) {
+      alert("Editar equipamento com ID: " + id);
+    }
+
+    function excluirEquipamento(id) {
+      if (confirm("Deseja realmente excluir este equipamento?")) {
+        fetch(`https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos/${id}`, {
+          method: 'DELETE'
+        })
+        .then(res => {
+          if (res.ok) {
+            alert("Equipamento excluído com sucesso!");
+            location.reload();
+          } else {
+            alert("Erro ao excluir equipamento.");
+          }
+        });
+      }
+    }
   </script>
 </body>
 </html>

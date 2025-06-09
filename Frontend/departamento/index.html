@@ -3,15 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>GETI - Lista de Departamentos</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/tabela/style.css"> 
 </head>
 <body>
   <div id="sidebar-container"></div>
 
   <div class="main-content">
     <h1>Lista de Departamentos</h1>
-    <div id="lista-departamentos" class="lista-itens">
-      <!-- Departamentos serão exibidos aqui -->
+
+    <div class="tabela-container">
+      <table class="tabela-listagem" id="tabela-departamentos">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Linhas adicionadas dinamicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="editModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background-color: rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
+    <div style="background:#111; padding:20px; border:1px solid orange; border-radius:8px; max-width:400px; width:90%;">
+      <h2 style="text-align:center; color:orange;">Editar Departamento</h2>
+      <form id="formEditarDepartamento">
+        <input type="hidden" id="edit-id">
+        <input type="text" id="edit-nome" placeholder="Nome" required>
+        <button type="submit">Salvar</button>
+        <button type="button" onclick="fecharModal()" style="margin-top:10px; background-color:#333; color:white">Cancelar</button>
+      </form>
     </div>
   </div>
 
@@ -25,26 +48,103 @@
         document.body.appendChild(script);
       });
 
-    fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/departamentos')
-      .then(res => res.json())
-      .then(data => {
-        const lista = document.getElementById("lista-departamentos");
-        lista.innerHTML = "";
+    const url = 'https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/departamentos';
 
-        if (Array.isArray(data)) {
-          data.forEach(dep => {
-            const item = document.createElement("div");
-            item.className = "item-card";
-            item.innerHTML = `<h3>${dep.nome}</h3>`;
-            lista.appendChild(item);
-          });
-        } else {
-          lista.innerHTML = `<p>Erro ao carregar departamentos.</p>`;
-        }
+    function carregarDepartamentos() {
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const corpoTabela = document.querySelector("#tabela-departamentos tbody");
+          corpoTabela.innerHTML = "";
+
+          if (Array.isArray(data)) {
+            data.forEach(dep => {
+              const linha = document.createElement("tr");
+              linha.innerHTML = `
+                <td>${dep.nome}</td>
+                <td class="acoes">
+                  <div class="menu-container">
+                    <button class="menu-btn" onclick="toggleMiniMenu(event)">⋮</button>
+                    <div class="mini-menu">
+                      <button onclick="abrirModalEdicao('${dep.id}', '${dep.nome}')">Editar</button>
+                      <button onclick="excluirDepartamento('${dep.id}')">Excluir</button>
+                    </div>
+                  </div>
+                </td>
+              `;
+              corpoTabela.appendChild(linha);
+            });
+          } else {
+            corpoTabela.innerHTML = `<tr><td colspan="2">Erro ao carregar dados.</td></tr>`;
+          }
+        })
+        .catch(() => {
+          document.querySelector("#tabela-departamentos tbody").innerHTML = `<tr><td colspan="2">Erro ao buscar departamentos.</td></tr>`;
+        });
+    }
+
+    carregarDepartamentos();
+
+    function toggleMiniMenu(event) {
+      event.stopPropagation();
+      document.querySelectorAll(".mini-menu").forEach(menu => menu.style.display = 'none');
+      const menu = event.currentTarget.nextElementSibling;
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      const rect = event.currentTarget.getBoundingClientRect();
+      menu.style.top = `${rect.bottom}px`;
+      menu.style.left = `${rect.left - 100}px`;
+    }
+
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".mini-menu").forEach(menu => menu.style.display = 'none');
+    });
+
+    function abrirModalEdicao(id, nome) {
+      document.getElementById("edit-id").value = id;
+      document.getElementById("edit-nome").value = nome;
+      document.getElementById("editModal").style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById("editModal").style.display = 'none';
+    }
+
+    document.getElementById("formEditarDepartamento").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const id = document.getElementById("edit-id").value;
+      const nome = document.getElementById("edit-nome").value;
+
+      fetch(`${url}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome })
       })
-      .catch(() => {
-        document.getElementById("lista-departamentos").innerHTML = "<p>Erro ao buscar departamentos.</p>";
+      .then(res => {
+        if (res.ok) {
+          alert("Departamento atualizado com sucesso.");
+          fecharModal();
+          carregarDepartamentos();
+        } else {
+          alert("Erro ao atualizar departamento.");
+        }
       });
+    });
+
+    function excluirDepartamento(id) {
+      if (confirm("Tem certeza que deseja excluir este departamento?")) {
+        fetch(`${url}/${id}`, {
+          method: "DELETE"
+        })
+        .then(res => {
+          if (res.ok) {
+            alert("Departamento excluído com sucesso.");
+            carregarDepartamentos();
+          } else {
+            alert("Erro ao excluir departamento.");
+          }
+        });
+      }
+    }
   </script>
 </body>
 </html>

@@ -3,19 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <title>GETI - Lista de Funcionários</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/tabela/style.css">
 </head>
 <body>
   <div id="sidebar-container"></div>
 
   <div class="main-content">
     <h1>Lista de Funcionários</h1>
-    <div id="lista-funcionarios" class="lista-itens">
-      <!-- Funcionários serão exibidos aqui -->
+
+    <div class="tabela-container">
+      <table class="tabela-listagem" id="tabela-funcionarios">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Linhas adicionadas dinamicamente -->
+        </tbody>
+      </table>
     </div>
   </div>
 
   <script>
+    // Sidebar dinâmico
     fetch('/sidebar/index.html')
       .then(res => res.text())
       .then(html => {
@@ -25,30 +39,76 @@
         document.body.appendChild(script);
       });
 
+    // Carregar funcionários
     fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/funcionarios')
       .then(res => res.json())
       .then(data => {
-        const lista = document.getElementById("lista-funcionarios");
-        lista.innerHTML = "";
+        const corpoTabela = document.querySelector("#tabela-funcionarios tbody");
+        corpoTabela.innerHTML = "";
 
         if (Array.isArray(data)) {
           data.forEach(func => {
-            const item = document.createElement("div");
-            item.className = "item-card";
-            item.innerHTML = `
-              <h3>${func.nome}</h3>
-              <p><strong>Email:</strong> ${func.email || '---'}</p>
-              <p><strong>Telefone:</strong> ${func.telefone || '---'}</p>
+            const linha = document.createElement("tr");
+            linha.innerHTML = `
+              <td>${func.nome}</td>
+              <td>${func.email || '---'}</td>
+              <td>${func.telefone || '---'}</td>
+              <td class="acoes">
+                <div class="menu-container">
+                  <button class="menu-btn" onclick="abrirMenu(this)">⋮</button>
+                  <div class="mini-menu">
+                    <button onclick="editarFuncionario('${func.id}')">Editar</button>
+                    <button onclick="excluirFuncionario('${func.id}')">Excluir</button>
+                  </div>
+                </div>
+              </td>
             `;
-            lista.appendChild(item);
+            corpoTabela.appendChild(linha);
           });
         } else {
-          lista.innerHTML = `<p>Erro ao carregar funcionários.</p>`;
+          corpoTabela.innerHTML = `<tr><td colspan="4">Erro ao carregar funcionários.</td></tr>`;
         }
       })
       .catch(() => {
-        document.getElementById("lista-funcionarios").innerHTML = "<p>Erro ao buscar funcionários.</p>";
+        const corpoTabela = document.querySelector("#tabela-funcionarios tbody");
+        corpoTabela.innerHTML = `<tr><td colspan="4">Erro ao buscar funcionários.</td></tr>`;
       });
+
+    function abrirMenu(botao) {
+      const menus = document.querySelectorAll(".mini-menu");
+      menus.forEach(menu => menu.style.display = "none");
+
+      const menu = botao.nextElementSibling;
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+
+      document.addEventListener("click", function fechar(e) {
+        if (!botao.parentElement.contains(e.target)) {
+          menu.style.display = "none";
+          document.removeEventListener("click", fechar);
+        }
+      });
+    }
+
+    function editarFuncionario(id) {
+      alert("Editar funcionário com ID: " + id);
+      // Você pode redirecionar ou abrir modal de edição aqui
+    }
+
+    function excluirFuncionario(id) {
+      if (confirm("Deseja realmente excluir este funcionário?")) {
+        fetch(`https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/funcionarios/${id}`, {
+          method: 'DELETE'
+        })
+        .then(res => {
+          if (res.ok) {
+            alert("Funcionário excluído com sucesso!");
+            location.reload();
+          } else {
+            alert("Erro ao excluir funcionário.");
+          }
+        });
+      }
+    }
   </script>
 </body>
 </html>
