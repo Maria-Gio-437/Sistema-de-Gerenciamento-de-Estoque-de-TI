@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GETI - Lista de Funcionários</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div id="sidebar-container"></div>
+
+  <div class="main-content">
+    <h1>Lista de Funcionários</h1>
+    <div id="lista-funcionarios" class="lista-itens">
+      <!-- Funcionários serão exibidos aqui -->
+    </div>
+  </div>
+
+  <script>
+    fetch('/sidebar/index.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("sidebar-container").innerHTML = html;
+        const script = document.createElement("script");
+        script.src = "/sidebar/sidebar.js";
+        document.body.appendChild(script);
+      });
+
+    fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/funcionarios')
+      .then(res => res.json())
+      .then(data => {
+        const lista = document.getElementById("lista-funcionarios");
+        lista.innerHTML = "";
+
+        if (Array.isArray(data)) {
+          data.forEach(func => {
+            const item = document.createElement("div");
+            item.className = "item-card";
+            item.innerHTML = `
+              <h3>${func.nome}</h3>
+              <p><strong>Email:</strong> ${func.email || '---'}</p>
+              <p><strong>Telefone:</strong> ${func.telefone || '---'}</p>
+            `;
+            lista.appendChild(item);
+          });
+        } else {
+          lista.innerHTML = `<p>Erro ao carregar funcionários.</p>`;
+        }
+      })
+      .catch(() => {
+        document.getElementById("lista-funcionarios").innerHTML = "<p>Erro ao buscar funcionários.</p>";
+      });
+  </script>
+</body>
+</html>
