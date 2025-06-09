@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GETI - Lista de Departamentos</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div id="sidebar-container"></div>
+
+  <div class="main-content">
+    <h1>Lista de Departamentos</h1>
+    <div id="lista-departamentos" class="lista-itens">
+      <!-- Departamentos serão exibidos aqui -->
+    </div>
+  </div>
+
+  <script>
+    fetch('/sidebar/index.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("sidebar-container").innerHTML = html;
+        const script = document.createElement("script");
+        script.src = "/sidebar/sidebar.js";
+        document.body.appendChild(script);
+      });
+
+    fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/departamentos')
+      .then(res => res.json())
+      .then(data => {
+        const lista = document.getElementById("lista-departamentos");
+        lista.innerHTML = "";
+
+        if (Array.isArray(data)) {
+          data.forEach(dep => {
+            const item = document.createElement("div");
+            item.className = "item-card";
+            item.innerHTML = `<h3>${dep.nome}</h3>`;
+            lista.appendChild(item);
+          });
+        } else {
+          lista.innerHTML = `<p>Erro ao carregar departamentos.</p>`;
+        }
+      })
+      .catch(() => {
+        document.getElementById("lista-departamentos").innerHTML = "<p>Erro ao buscar departamentos.</p>";
+      });
+  </script>
+</body>
+</html>
