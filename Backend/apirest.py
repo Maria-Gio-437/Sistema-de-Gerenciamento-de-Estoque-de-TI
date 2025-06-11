@@ -267,13 +267,40 @@ def listar_funcionarios():
 # Criar funcionario
 @app.route('/funcionarios', methods=['POST'])
 def criar_funcionario():
-    data = request.json
-    resp = supabase.client.from_('funcionario').insert([data]).execute()
-    if resp.data is not None and len(resp.data) > 0:
-        return jsonify(resp.data), 201
-    else:
-        return jsonify({'error': 'Erro ao criar funcionario', 'details': resp}), 500
-    
+    try:
+        data = request.json
+        nome_departamento = data.get('departamento')
+
+        if not nome_departamento:
+            return jsonify({'error': 'O campo "departamento" (com o nome) é obrigatório'}), 400
+
+        resp_depto = supabase.client.from_('departamento').select('id').eq('nome', nome_departamento).execute()
+
+        if not resp_depto.data:
+            return jsonify({'error': f'Departamento com o nome "{nome_departamento}" não foi encontrado.'}), 404
+        
+        departamento_id = resp_depto.data[0]['id']
+
+        dados_para_inserir = {
+            'nome': data.get('nome'),
+            'email': data.get('email'),
+            'senha': data.get('senha'), # Lembre-se de criptografar senhas em produção!
+            'cpf': data.get('cpf'),
+            'funcao': data.get('funcao'),
+            'departamento_id': departamento_id # Aqui usamos o ID que encontramos!
+        }
+
+        resp_funcionario = supabase.client.from_('funcionario').insert([dados_para_inserir]).execute()
+
+        if resp_funcionario.data:
+            return jsonify(resp_funcionario.data[0]), 201
+        else:
+            error_details = str(resp_funcionario.error) if resp_funcionario.error else "Detalhes não disponíveis"
+            return jsonify({'error': 'Erro ao inserir funcionário no banco de dados.', 'details': error_details}), 500
+
+    except Exception as e:
+        return jsonify({'error': 'Ocorreu um erro interno no servidor.', 'details': str(e)}), 500
+   
 # Editar funcionario
 @app.route('/funcionarios/<id>', methods=['PUT'])
 def editar_funcionario(id):
