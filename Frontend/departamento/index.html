@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>GETI - Lista de Departamentos</title>
-  <link rel="stylesheet" href="../css/tabela/style.css"> 
+  <link rel="stylesheet" href="../css/tabela/style.css">
 </head>
 <body>
   <div id="sidebar-container"></div>
@@ -19,21 +19,22 @@
             <th>Ações</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Linhas adicionadas dinamicamente -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   </div>
 
-  <div id="editModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background-color: rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:#111; padding:20px; border:1px solid orange; border-radius:8px; max-width:400px; width:90%;">
-      <h2 style="text-align:center; color:orange;">Editar Departamento</h2>
+  <!-- Modal Editar -->
+  <div id="editModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <h2>Editar Departamento</h2>
       <form id="formEditarDepartamento">
         <input type="hidden" id="edit-id">
-        <input type="text" id="edit-nome" placeholder="Nome" required>
-        <button type="submit">Salvar</button>
-        <button type="button" onclick="fecharModal()" style="margin-top:10px; background-color:#333; color:white">Cancelar</button>
+        <input type="text" id="edit-nome" placeholder="Nome do Departamento" required>
+        <div class="modal-buttons">
+          <button type="submit">Salvar</button>
+          <button type="button" onclick="fecharModal()">Cancelar</button>
+        </div>
       </form>
     </div>
   </div>
@@ -132,9 +133,7 @@
 
     function excluirDepartamento(id) {
       if (confirm("Tem certeza que deseja excluir este departamento?")) {
-        fetch(`${url}/${id}`, {
-          method: "DELETE"
-        })
+        fetch(`${url}/${id}`, { method: "DELETE" })
         .then(res => {
           if (res.ok) {
             alert("Departamento excluído com sucesso.");
