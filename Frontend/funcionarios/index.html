@@ -21,15 +21,28 @@
             <th>Ações</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Linhas adicionadas dinamicamente -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   </div>
 
+  <!-- Modal de edição -->
+  <div id="modal-editar" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h2>Editar Funcionário</h2>
+      <input type="hidden" id="editar-id">
+      <input type="text" id="editar-nome" placeholder="Nome">
+      <input type="email" id="editar-email" placeholder="E-mail">
+      <input type="text" id="editar-telefone" placeholder="Telefone">
+      <div class="modal-buttons">
+        <button onclick="salvarEdicao()">Salvar</button>
+        <button onclick="fecharModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Sidebar dinâmico
+    // Carregar sidebar
     fetch('/sidebar/index.html')
       .then(res => res.text())
       .then(html => {
@@ -39,47 +52,54 @@
         document.body.appendChild(script);
       });
 
-    // Carregar funcionários
-    fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/funcionarios')
-      .then(res => res.json())
-      .then(data => {
-        const corpoTabela = document.querySelector("#tabela-funcionarios tbody");
-        corpoTabela.innerHTML = "";
+    // Carregar lista
+    const URL = 'https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/funcionarios';
 
-        if (Array.isArray(data)) {
-          data.forEach(func => {
-            const linha = document.createElement("tr");
-            linha.innerHTML = `
-              <td>${func.nome}</td>
-              <td>${func.email || '---'}</td>
-              <td>${func.telefone || '---'}</td>
-              <td class="acoes">
-                <div class="menu-container">
-                  <button class="menu-btn" onclick="abrirMenu(this)">⋮</button>
-                  <div class="mini-menu">
-                    <button onclick="editarFuncionario('${func.id}')">Editar</button>
-                    <button onclick="excluirFuncionario('${func.id}')">Excluir</button>
+    function carregarFuncionarios() {
+      fetch(URL)
+        .then(res => res.json())
+        .then(data => {
+          const corpoTabela = document.querySelector("#tabela-funcionarios tbody");
+          corpoTabela.innerHTML = "";
+
+          if (Array.isArray(data)) {
+            data.forEach(func => {
+              const linha = document.createElement("tr");
+              linha.innerHTML = `
+                <td>${func.nome}</td>
+                <td>${func.email || '---'}</td>
+                <td>${func.telefone || '---'}</td>
+                <td class="acoes">
+                  <div class="menu-container">
+                    <button class="menu-btn" onclick="abrirMenu(this)">⋮</button>
+                    <div class="mini-menu">
+                      <button onclick="abrirModalEditar('${func.id}', '${func.nome}', '${func.email}', '${func.telefone}')">Editar</button>
+                      <button onclick="excluirFuncionario('${func.id}')">Excluir</button>
+                    </div>
                   </div>
-                </div>
-              </td>
-            `;
-            corpoTabela.appendChild(linha);
-          });
-        } else {
-          corpoTabela.innerHTML = `<tr><td colspan="4">Erro ao carregar funcionários.</td></tr>`;
-        }
-      })
-      .catch(() => {
-        const corpoTabela = document.querySelector("#tabela-funcionarios tbody");
-        corpoTabela.innerHTML = `<tr><td colspan="4">Erro ao buscar funcionários.</td></tr>`;
-      });
+                </td>
+              `;
+              corpoTabela.appendChild(linha);
+            });
+          } else {
+            corpoTabela.innerHTML = `<tr><td colspan="4">Erro ao carregar funcionários.</td></tr>`;
+          }
+        })
+        .catch(() => {
+          const corpoTabela = document.querySelector("#tabela-funcionarios tbody");
+          corpoTabela.innerHTML = `<tr><td colspan="4">Erro ao buscar funcionários.</td></tr>`;
+        });
+    }
 
+    carregarFuncionarios();
+
+    // Menu ⋮
     function abrirMenu(botao) {
       const menus = document.querySelectorAll(".mini-menu");
       menus.forEach(menu => menu.style.display = "none");
 
       const menu = botao.nextElementSibling;
-      menu.style.display = menu.style.display === "block" ? "none" : "block";
+      menu.style.display = "block";
 
       document.addEventListener("click", function fechar(e) {
         if (!botao.parentElement.contains(e.target)) {
@@ -89,24 +109,52 @@
       });
     }
 
-    function editarFuncionario(id) {
-      alert("Editar funcionário com ID: " + id);
-      // Você pode redirecionar ou abrir modal de edição aqui
+    // Modal editar
+    function abrirModalEditar(id, nome, email, telefone) {
+      document.getElementById("editar-id").value = id;
+      document.getElementById("editar-nome").value = nome;
+      document.getElementById("editar-email").value = email !== '---' ? email : '';
+      document.getElementById("editar-telefone").value = telefone !== '---' ? telefone : '';
+      document.getElementById("modal-editar").style.display = "flex";
+    }
+
+    function fecharModal() {
+      document.getElementById("modal-editar").style.display = "none";
+    }
+
+    function salvarEdicao() {
+      const id = document.getElementById("editar-id").value;
+      const nome = document.getElementById("editar-nome").value;
+      const email = document.getElementById("editar-email").value;
+      const telefone = document.getElementById("editar-telefone").value;
+
+      fetch(`${URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, telefone })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert("Funcionário atualizado com sucesso!");
+          fecharModal();
+          carregarFuncionarios();
+        } else {
+          alert("Erro ao atualizar funcionário.");
+        }
+      });
     }
 
     function excluirFuncionario(id) {
       if (confirm("Deseja realmente excluir este funcionário?")) {
-        fetch(`https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/funcionarios/${id}`, {
-          method: 'DELETE'
-        })
-        .then(res => {
-          if (res.ok) {
-            alert("Funcionário excluído com sucesso!");
-            location.reload();
-          } else {
-            alert("Erro ao excluir funcionário.");
-          }
-        });
+        fetch(`${URL}/${id}`, { method: 'DELETE' })
+          .then(res => {
+            if (res.ok) {
+              alert("Funcionário excluído com sucesso!");
+              carregarFuncionarios();
+            } else {
+              alert("Erro ao excluir funcionário.");
+            }
+          });
       }
     }
   </script>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>GETI - Lista de Equipamentos</title>
-  <link rel="stylesheet" href="../css/tabela/style.css"> 
+  <link rel="stylesheet" href="../css/tabela/style.css">
 </head>
 <body>
   <div id="sidebar-container"></div>
@@ -23,10 +23,32 @@
             <th>Ações</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Linhas adicionadas dinamicamente -->
-        </tbody>
+        <tbody></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Modal de Edição -->
+  <div id="editModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h2>Editar Equipamento</h2>
+      <form id="formEditarEquipamento">
+        <input type="hidden" id="edit-id">
+        <input type="text" id="edit-nome" placeholder="Nome" required>
+        <input type="text" id="edit-numero" placeholder="Número de Série" required>
+        <input type="text" id="edit-tipo" placeholder="Tipo">
+        <select id="edit-status" required>
+          <option value="">Selecione o status</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+          <option value="manutenção">Manutenção</option>
+        </select>
+        <input type="date" id="edit-data">
+        <div class="modal-buttons">
+          <button type="submit">Salvar</button>
+          <button type="button" onclick="fecharModal()">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -40,47 +62,52 @@
         document.body.appendChild(script);
       });
 
-    fetch('https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos')
-      .then(res => res.json())
-      .then(data => {
-        const corpoTabela = document.querySelector("#tabela-equipamentos tbody");
-        corpoTabela.innerHTML = "";
+    const url = 'https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos';
 
-        if (Array.isArray(data)) {
-          data.forEach(eq => {
-            const linha = document.createElement("tr");
-            linha.innerHTML = `
-              <td>${eq.nome}</td>
-              <td>${eq.numero_serie}</td>
-              <td>${eq.tipo || '---'}</td>
-              <td>${eq.status}</td>
-              <td>${eq.data_aquisicao || '---'}</td>
-              <td class="acoes">
-                <div class="menu-container">
-                  <button class="menu-btn" onclick="abrirMenu(this)">⋮</button>
-                  <div class="mini-menu">
-                    <button onclick="editarEquipamento('${eq.id}')">Editar</button>
-                    <button onclick="excluirEquipamento('${eq.id}')">Excluir</button>
+    function carregarEquipamentos() {
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const corpoTabela = document.querySelector("#tabela-equipamentos tbody");
+          corpoTabela.innerHTML = "";
+
+          if (Array.isArray(data)) {
+            data.forEach(eq => {
+              const linha = document.createElement("tr");
+              linha.innerHTML = `
+                <td>${eq.nome}</td>
+                <td>${eq.numero_serie}</td>
+                <td>${eq.tipo || '---'}</td>
+                <td>${eq.status}</td>
+                <td>${eq.data_aquisicao || '---'}</td>
+                <td class="acoes">
+                  <div class="menu-container">
+                    <button class="menu-btn" onclick="abrirMenu(this)">⋮</button>
+                    <div class="mini-menu">
+                      <button onclick="abrirModalEditar('${eq.id}', '${eq.nome}', '${eq.numero_serie}', '${eq.tipo || ''}', '${eq.status}', '${eq.data_aquisicao || ''}')">Editar</button>
+                      <button onclick="excluirEquipamento('${eq.id}')">Excluir</button>
+                    </div>
                   </div>
-                </div>
-              </td>
-            `;
-            corpoTabela.appendChild(linha);
-          });
-        } else {
-          corpoTabela.innerHTML = `<tr><td colspan="6">Erro ao carregar dados.</td></tr>`;
-        }
-      })
-      .catch(() => {
-        const corpoTabela = document.querySelector("#tabela-equipamentos tbody");
-        corpoTabela.innerHTML = `<tr><td colspan="6">Erro ao buscar equipamentos.</td></tr>`;
-      });
+                </td>
+              `;
+              corpoTabela.appendChild(linha);
+            });
+          } else {
+            corpoTabela.innerHTML = `<tr><td colspan="6">Erro ao carregar dados.</td></tr>`;
+          }
+        })
+        .catch(() => {
+          document.querySelector("#tabela-equipamentos tbody").innerHTML = `<tr><td colspan="6">Erro ao buscar equipamentos.</td></tr>`;
+        });
+    }
+
+    carregarEquipamentos();
 
     function abrirMenu(botao) {
       const menus = document.querySelectorAll(".mini-menu");
       menus.forEach(menu => menu.style.display = "none");
       const menu = botao.nextElementSibling;
-      menu.style.display = menu.style.display === "block" ? "none" : "block";
+      menu.style.display = "block";
 
       document.addEventListener("click", function fechar(e) {
         if (!botao.parentElement.contains(e.target)) {
@@ -90,19 +117,54 @@
       });
     }
 
-    function editarEquipamento(id) {
-      alert("Editar equipamento com ID: " + id);
+    function abrirModalEditar(id, nome, numero, tipo, status, data) {
+      document.getElementById("edit-id").value = id;
+      document.getElementById("edit-nome").value = nome;
+      document.getElementById("edit-numero").value = numero;
+      document.getElementById("edit-tipo").value = tipo;
+      document.getElementById("edit-status").value = status;
+      document.getElementById("edit-data").value = data;
+      document.getElementById("editModal").style.display = "flex";
     }
+
+    function fecharModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    document.getElementById("formEditarEquipamento").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const id = document.getElementById("edit-id").value;
+      const nome = document.getElementById("edit-nome").value;
+      const numero_serie = document.getElementById("edit-numero").value;
+      const tipo = document.getElementById("edit-tipo").value;
+      const status = document.getElementById("edit-status").value;
+      const data_aquisicao = document.getElementById("edit-data").value;
+
+      fetch(`${url}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, numero_serie, tipo, status, data_aquisicao })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert("Equipamento atualizado com sucesso!");
+          fecharModal();
+          carregarEquipamentos();
+        } else {
+          alert("Erro ao atualizar equipamento.");
+        }
+      });
+    });
 
     function excluirEquipamento(id) {
       if (confirm("Deseja realmente excluir este equipamento?")) {
-        fetch(`https://sistema-de-gerenciamento-de-estoque-de-ti.onrender.com/equipamentos/${id}`, {
+        fetch(`${url}/${id}`, {
           method: 'DELETE'
         })
         .then(res => {
           if (res.ok) {
             alert("Equipamento excluído com sucesso!");
-            location.reload();
+            carregarEquipamentos();
           } else {
             alert("Erro ao excluir equipamento.");
           }
