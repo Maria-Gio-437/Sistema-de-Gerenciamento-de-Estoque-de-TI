@@ -13,7 +13,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Sidebar */
 .sidebar {
   width: 220px;
   height: 100vh;
@@ -65,7 +64,6 @@ body {
   color: #111;
 }
 
-/* Conteúdo principal */
 .main-content {
   margin-left: 220px;
   padding: 120px 20px;
@@ -76,11 +74,8 @@ body {
 .main-content h1 {
   text-align: center;
   margin-bottom: 30px;
-  font-size: 28px;
-  color: white;
 }
 
-/* Formulário */
 .form-cadastro {
   background-color: #111;
   padding: 30px;
@@ -118,37 +113,4 @@ body {
 
 .form-cadastro button:hover {
   background-color: #ff9900;
-}
-
-/* Tabela estilizada */
-.tabela-container {
-  overflow-x: auto;
-}
-
-.tabela-listagem {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #111;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(255, 165, 0, 0.1);
-}
-
-.tabela-listagem th,
-.tabela-listagem td {
-  padding: 16px;
-  text-align: left;
-  border-bottom: 1px solid #333;
-  font-size: 15px;
-  color: white;
-}
-
-.tabela-listagem th {
-  background-color: orange;
-  color: #111;
-  font-size: 16px;
-}
-
-.tabela-listagem tr:hover {
-  background-color: #1f1f1f;
 }
